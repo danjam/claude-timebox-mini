@@ -1,0 +1,10 @@
+{
+  "name": "claude-timebox-mini",
+  "owner": { "name": "danjam" },
+  "plugins": [
+    {
+      "name": "claude-timebox-mini",
+      "source": "./plugins/claude-timebox-mini"
+    }
+  ]
+}
