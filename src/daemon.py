@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
-"""divoomctl — Claude Code → Timebox Mini state daemon.
+"""claude-timebox-mini — HTTP→RFCOMM bridge for a Divoom Timebox Mini.
 
-Stdlib only. Hardcoded for a single Mini. GET endpoints:
+Stdlib only. GET endpoints:
     /thinking  /waiting  /done  /reset  /ping
 
-Protocol helpers lifted from the empirically-validated test harness at
-/opt/stacks/divoomctl/proto.py on orac. See PROTOCOL.md for byte-level spec.
+Requires CLAUDE_TIMEBOX_MINI_MAC env var (the Mini's Bluetooth MAC).
 """
 import datetime
 import http.server
