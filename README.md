@@ -32,7 +32,7 @@ Then set the hook env vars somewhere Claude Code will pick them up (your shell p
 
 | Variable | Required | Description |
 |---|---|---|
-| `CLAUDE_TIMEBOX_MINI_HOST` | yes | `host:port` where your daemon is reachable (e.g. `mini-host.local:25293`). |
+| `CLAUDE_TIMEBOX_MINI_BASE_URL` | yes | Base URL where your daemon is reachable, scheme included (e.g. `http://mini-host.local:25293` or `https://mini.example.com`). |
 | `CLAUDE_TIMEBOX_MINI_ALLOWED_GATEWAYS` | no | Comma-separated default-gateway MACs. If set, hooks only fire when your laptop's default gateway matches one — useful if you only want the Mini lit up when you're on your home network. Leave empty to always fire. |
 
 ## Run the daemon

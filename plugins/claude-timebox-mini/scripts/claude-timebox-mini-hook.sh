@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 # claude-timebox-mini-hook.sh <thinking|waiting|done|reset>
 #
-# Fires a GET at CLAUDE_TIMEBOX_MINI_HOST. Optionally gates on the default-
-# gateway MAC so the hook only fires when Claude Code is running on a
-# trusted network.
+# Fires a GET at CLAUDE_TIMEBOX_MINI_BASE_URL (full URL including scheme).
+# Optionally gates on the default-gateway MAC so the hook only fires when
+# Claude Code is running on a trusted network.
 set -eu
 state="${1:-}"
-host="${CLAUDE_TIMEBOX_MINI_HOST:-}"
+base_url="${CLAUDE_TIMEBOX_MINI_BASE_URL:-}"
 allowed="${CLAUDE_TIMEBOX_MINI_ALLOWED_GATEWAYS:-}"
 
 [ -n "$state" ] || exit 0
-[ -n "$host" ] || exit 0
+[ -n "$base_url" ] || exit 0
 
 # Notification filter: Claude Code's Notification hook fires for multiple
 # cases (idle_prompt | permission_prompt | elicitation_dialog | auth_success).
@@ -36,4 +36,4 @@ if [ -n "$allowed" ]; then
     echo "$allowed" | tr ',' '\n' | grep -qi "^${mac}$" || exit 0
 fi
 
-curl -fsS --max-time 2 "http://${host}/${state}" >/dev/null 2>&1 || true
+curl -fsS --max-time 2 "${base_url%/}/${state}" >/dev/null 2>&1 || true
