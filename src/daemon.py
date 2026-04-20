@@ -7,6 +7,7 @@ Stdlib only. GET endpoints:
 Requires CLAUDE_TIMEBOX_MINI_MAC env var (the Mini's Bluetooth MAC).
 """
 import datetime
+import hmac
 import http.server
 import os
 import signal
@@ -20,6 +21,7 @@ import time
 MAC = os.environ.get("CLAUDE_TIMEBOX_MINI_MAC")
 if not MAC:
     sys.exit("CLAUDE_TIMEBOX_MINI_MAC env var is required (the Mini's Bluetooth MAC)")
+API_KEY = os.environ.get("CLAUDE_TIMEBOX_MINI_API_KEY") or None
 RFCOMM_PORT = 4
 HTTP_PORT = 25293
 
@@ -273,6 +275,11 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(PING_MAGIC)
             return
+        if API_KEY and not hmac.compare_digest(
+            self.headers.get("Authorization", ""), f"Bearer {API_KEY}"
+        ):
+            self.send_error(401)
+            return
         if path not in STATES:
             self.send_error(404)
             return
@@ -327,7 +334,11 @@ def main():
     ])
 
     httpd = http.server.ThreadingHTTPServer(("0.0.0.0", HTTP_PORT), Handler)
-    print(f"[http] listening on 0.0.0.0:{HTTP_PORT}", flush=True)
+    print(
+        f"[http] listening on 0.0.0.0:{HTTP_PORT} "
+        f"(auth: {'required' if API_KEY else 'disabled'})",
+        flush=True,
+    )
     httpd.serve_forever()
 
 

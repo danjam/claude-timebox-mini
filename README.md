@@ -33,6 +33,7 @@ Then set the hook env vars somewhere Claude Code will pick them up (your shell p
 | Variable | Required | Description |
 |---|---|---|
 | `CLAUDE_TIMEBOX_MINI_BASE_URL` | yes | Base URL where your daemon is reachable, scheme included (e.g. `http://mini-host.local:25293` or `https://mini.example.com`). |
+| `CLAUDE_TIMEBOX_MINI_API_KEY` | no | Bearer token sent as `Authorization: Bearer <token>`. Set this to the same value as the daemon's `CLAUDE_TIMEBOX_MINI_API_KEY`. Omit if your daemon has auth disabled. |
 | `CLAUDE_TIMEBOX_MINI_ALLOWED_GATEWAYS` | no | Comma-separated default-gateway MACs. If set, hooks only fire when your laptop's default gateway matches one — useful if you only want the Mini lit up when you're on your home network. Leave empty to always fire. |
 
 ## Run the daemon
@@ -42,7 +43,12 @@ The daemon source is `src/daemon.py`. It's stdlib-only Python, opens a single lo
 - `/thinking`, `/waiting`, `/done`, `/reset` — state changes
 - `/ping` — reachability probe; returns `200 OK` without touching the Mini
 
-One required env var: `CLAUDE_TIMEBOX_MINI_MAC` — the Mini's Bluetooth MAC.
+Env vars:
+
+| Variable | Required | Description |
+|---|---|---|
+| `CLAUDE_TIMEBOX_MINI_MAC` | yes | The Mini's Bluetooth MAC. |
+| `CLAUDE_TIMEBOX_MINI_API_KEY` | no | If set, the daemon requires `Authorization: Bearer <this>` on all endpoints except `/ping`. Leave unset to disable auth. |
 
 Deployment is up to you — the plugin only needs the five HTTP endpoints to answer. A few options:
 
@@ -66,6 +72,7 @@ services:
     environment:
       TZ: Europe/London
       CLAUDE_TIMEBOX_MINI_MAC: ${CLAUDE_TIMEBOX_MINI_MAC}
+      # CLAUDE_TIMEBOX_MINI_API_KEY: ${CLAUDE_TIMEBOX_MINI_API_KEY}  # optional
 ```
 
 `network_mode: host` is needed so the container can open Bluetooth sockets. Set `CLAUDE_TIMEBOX_MINI_MAC` in a `.env` file next to the compose or in your shell.

@@ -2,11 +2,13 @@
 # claude-timebox-mini-hook.sh <thinking|waiting|done|reset>
 #
 # Fires a GET at CLAUDE_TIMEBOX_MINI_BASE_URL (full URL including scheme).
+# Optionally sends a bearer token via CLAUDE_TIMEBOX_MINI_API_KEY.
 # Optionally gates on the default-gateway MAC so the hook only fires when
 # Claude Code is running on a trusted network.
 set -eu
 state="${1:-}"
 base_url="${CLAUDE_TIMEBOX_MINI_BASE_URL:-}"
+api_key="${CLAUDE_TIMEBOX_MINI_API_KEY:-}"
 allowed="${CLAUDE_TIMEBOX_MINI_ALLOWED_GATEWAYS:-}"
 
 [ -n "$state" ] || exit 0
@@ -36,4 +38,6 @@ if [ -n "$allowed" ]; then
     echo "$allowed" | tr ',' '\n' | grep -qi "^${mac}$" || exit 0
 fi
 
-curl -fsS --max-time 2 "${base_url%/}/${state}" >/dev/null 2>&1 || true
+auth=()
+[ -n "$api_key" ] && auth=(-H "Authorization: Bearer $api_key")
+curl -fsS --max-time 2 "${auth[@]}" "${base_url%/}/${state}" >/dev/null 2>&1 || true
