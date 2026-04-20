@@ -1,6 +1,6 @@
 {
   "name": "claude-timebox-mini",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Drives a Divoom Timebox Mini as a visual status indicator for Claude Code sessions.",
   "author": { "name": "danjam" },
   "hooks": {
@@ -33,14 +33,6 @@
         "matcher": "",
         "hooks": [
           { "type": "command", "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/claude-timebox-mini-hook.sh thinking &" }
-        ]
-      }
-    ],
-    "Notification": [
-      {
-        "matcher": "",
-        "hooks": [
-          { "type": "command", "command": "bash ${CLAUDE_PLUGIN_ROOT}/scripts/claude-timebox-mini-hook.sh waiting &" }
         ]
       }
     ],

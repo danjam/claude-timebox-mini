@@ -14,20 +14,6 @@ allowed="${CLAUDE_TIMEBOX_MINI_ALLOWED_GATEWAYS:-}"
 [ -n "$state" ] || exit 0
 [ -n "$base_url" ] || exit 0
 
-# Notification filter: Claude Code's Notification hook fires for multiple
-# reasons (idle_prompt, auth_success, …). Allowlist only the two types that
-# genuinely mean "Claude is blocked on user input". PreToolUse and
-# PermissionRequest events don't carry notification_type and pass through
-# unfiltered — they're trusted to only fire when the user is actually needed.
-if [ "$state" = "waiting" ]; then
-    payload=$(cat)
-    if echo "$payload" | grep -q '"notification_type"'; then
-        if ! echo "$payload" | grep -qE '"notification_type": *"(permission_prompt|elicitation_dialog)"'; then
-            exit 0
-        fi
-    fi
-fi
-
 if [ -n "$allowed" ]; then
     if [ "$(uname)" = "Darwin" ]; then
         gw=$(route -n get default 2>/dev/null | awk '/gateway:/ {print $2}')
