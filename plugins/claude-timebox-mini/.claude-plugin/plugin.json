@@ -1,6 +1,6 @@
 {
   "name": "claude-timebox-mini",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Drives a Divoom Timebox Mini as a visual status indicator for Claude Code sessions.",
   "author": { "name": "danjam" },
   "hooks": {

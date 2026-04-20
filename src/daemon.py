@@ -30,7 +30,6 @@ RED = (0xFF, 0x00, 0x00)
 GREEN = (0x00, 0xFF, 0x00)
 OFF = (0x00, 0x00, 0x00)
 
-# 8-frame orange breathing ramp, 100ms/frame (see COLORS.md).
 ORANGE_RAMP = [
     (0x40, 0x10, 0x00),
     (0x70, 0x20, 0x00),
@@ -42,7 +41,6 @@ ORANGE_RAMP = [
     (0x40, 0x10, 0x00),
 ]
 
-# 11×11 Clawd silhouette. '#' = on, '.' = off.
 CLAWD = """\
 ...........
 ..#######..
@@ -64,7 +62,7 @@ RECONNECT_BACKOFF_S = 5
 INTER_FRAME_GAP_S = 0.05  # keep under the ~30 pkt/s community ceiling
 PING_MAGIC = b"divoomctl ok\n"
 
-# -- Protocol helpers (verbatim from proto.py) --------------------------------
+# -- Protocol helpers ---------------------------------------------------------
 
 
 def checksum(payload):
@@ -212,7 +210,6 @@ _done_timer = None  # threading.Timer, guarded by _state_lock
 
 
 def _bump():
-    """Increment generation; cancel any pending done-revert. Returns new gen."""
     global _state_gen, _done_timer
     with _state_lock:
         _state_gen += 1
@@ -250,9 +247,19 @@ STATES = {
     "reset":    ("clock",    False),
 }
 
+_last_key = None
+
 
 def dispatch(path):
+    # Dedup: skip retransmitting 9 frames when the state hasn't changed.
+    # PostToolUse fires /thinking on every tool call during a turn; without
+    # this guard each one re-uploads the same animation over Bluetooth.
+    # Done bypasses dedup so consecutive dones reset the 3 s revert timer.
+    global _last_key
     frames_key, revert = STATES[path]
+    if frames_key == _last_key and not revert:
+        return
+    _last_key = frames_key
     gen = _bump()
     _send(FRAMES[frames_key])
     if revert:
@@ -323,8 +330,7 @@ def main():
     signal.signal(signal.SIGINT, shutdown)
     signal.signal(signal.SIGTERM, shutdown)
 
-    # First-connect baseline: sync the Mini's drifting RTC, force clock view.
-    # Blocks until Mini is reachable (the RFCOMM connect retries forever).
+    # Sync the Mini's RTC on every daemon start — it drifts measurably.
     now = datetime.datetime.now()
     _send([
         make_message(0x18, [now.year % 100, now.year // 100,

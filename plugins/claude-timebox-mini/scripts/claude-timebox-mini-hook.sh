@@ -22,7 +22,11 @@ if [ -n "$allowed" ]; then
         gw=$(ip route 2>/dev/null | awk '/^default/ {print $3; exit}')
         mac=$(ip neigh 2>/dev/null | awk -v g="$gw" '$1==g {print $5; exit}')
     fi
-    echo "$allowed" | tr ',' '\n' | grep -qi "^${mac}$" || exit 0
+    shopt -s nocasematch
+    case ",$allowed," in
+        *",$mac,"*) ;;
+        *) exit 0 ;;
+    esac
 fi
 
 auth=()
