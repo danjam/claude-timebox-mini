@@ -16,8 +16,8 @@ The plugin registers Claude Code hooks that fire HTTP GETs at a small daemon you
 ## What you need
 
 - A **Divoom Timebox Mini** (Bluetooth Classic — not the Timebox Evo, which uses a different protocol).
-- A host with **Bluetooth** to run the daemon. Pair and trust the Mini on it first (`bluetoothctl pair <MAC>`, `bluetoothctl trust <MAC>`).
-- **Claude Code** on the machine you code from.
+- A **Linux** host with Bluetooth to run the daemon. Pair and trust the Mini on it first (`bluetoothctl pair <MAC>`, `bluetoothctl trust <MAC>`). The daemon uses `AF_BLUETOOTH` sockets via the Linux kernel — macOS and Windows hosts aren't supported for the daemon side.
+- **Claude Code** on the machine you code from. The hook script is bash, so it runs on **Linux, macOS, and Windows via WSL** (or any bash-providing environment like Git Bash).
 
 ## Install the plugin
 
