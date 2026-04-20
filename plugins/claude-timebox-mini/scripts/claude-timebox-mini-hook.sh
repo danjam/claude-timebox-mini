@@ -15,16 +15,17 @@ allowed="${CLAUDE_TIMEBOX_MINI_ALLOWED_GATEWAYS:-}"
 [ -n "$base_url" ] || exit 0
 
 # Notification filter: Claude Code's Notification hook fires for multiple
-# cases (idle_prompt | permission_prompt | elicitation_dialog | auth_success).
-# Drop idle_prompt — it fires ~60s after turn end and would clobber the
-# /done → clock revert. PermissionRequest and PreToolUse(AskUserQuestion)
-# hooks cover the fast-path; Notification stays as a fallback.
+# reasons (idle_prompt, auth_success, …). Allowlist only the two types that
+# genuinely mean "Claude is blocked on user input". PreToolUse and
+# PermissionRequest events don't carry notification_type and pass through
+# unfiltered — they're trusted to only fire when the user is actually needed.
 if [ "$state" = "waiting" ]; then
     payload=$(cat)
-    case "$payload" in
-        *'"notification_type":"idle_prompt"'*) exit 0 ;;
-        *'"notification_type": "idle_prompt"'*) exit 0 ;;
-    esac
+    if echo "$payload" | grep -q '"notification_type"'; then
+        if ! echo "$payload" | grep -qE '"notification_type": *"(permission_prompt|elicitation_dialog)"'; then
+            exit 0
+        fi
+    fi
 fi
 
 if [ -n "$allowed" ]; then
