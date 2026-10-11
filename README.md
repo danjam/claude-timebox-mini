@@ -24,7 +24,7 @@ The plugin registers Claude Code hooks that fire HTTP GETs at a small daemon you
 In Claude Code:
 
 ```text
-/plugin marketplace add git@github.com:danjam/claude-timebox-mini.git
+/plugin marketplace add danjam/claude-timebox-mini
 /plugin install claude-timebox-mini
 ```
 
